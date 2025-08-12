@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <h1>RegExtractor</h1>
+        
+        <div class="section">
+            <label for="text-type-select">1. Select Text Type:</label>
+            <select id="text-type-select">
+                <option value="all">Entire page text</option>
+                <option value="visible">Visible text only</option>
+                <option value="selection">Selected text</option>
+                <option value="html">HTML source</option>
+            </select>
+        </div>
+        
+        <div class="section html-options" id="html-options" style="display: none;">
+            <label for="html-selector">CSS Selector (optional):</label>
+            <input type="text" id="html-selector" placeholder="e.g., .class, #id, div, a[href]">
+            <div class="html-type-options">
+                <label><input type="radio" name="html-type" value="outerHTML" checked> Outer HTML</label>
+                <label><input type="radio" name="html-type" value="innerHTML"> Inner HTML</label>
+                <label><input type="radio" name="html-type" value="textContent"> Text Content</label>
+            </div>
+        </div>
+        
+        <div class="section attribute-parser" id="attribute-parser">
+            <label>2. HTML Attribute Parser (optional):</label>
+            <div class="parser-controls">
+                <label><input type="checkbox" id="enable-attribute-parser"> Extract HTML attributes</label>
+            </div>
+            <div class="attribute-parser-options" id="attribute-parser-options" style="display: none;">
+                <div class="attribute-input-group">
+                    <label for="attribute-names">Attribute names (comma-separated):</label>
+                    <input type="text" id="attribute-names" placeholder="e.g., href, src, class, id, data-id">
+                </div>
+                <div class="attribute-input-group">
+                    <label for="attribute-selector">Target elements (CSS selector):</label>
+                    <input type="text" id="attribute-selector" placeholder="e.g., a, img, div[data-id]">
+                </div>
+                <div class="attribute-format">
+                    <label for="attribute-format">Output format:</label>
+                    <select id="attribute-format">
+                        <option value="values">Values only</option>
+                        <option value="key-value">key=value pairs</option>
+                        <option value="json">JSON format</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <label for="regex-input">3. Regex Pattern:</label>
+            <input type="text" id="regex-input" placeholder="Enter regex pattern..." value="\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b">
+            
+            <div class="flags">
+                <label><input type="checkbox" id="flag-g" checked> Global (g)</label>
+                <label><input type="checkbox" id="flag-i"> Ignore Case (i)</label>
+                <label><input type="checkbox" id="flag-m"> Multiline (m)</label>
+            </div>
+            
+            <div class="capture-options">
+                <label><input type="checkbox" id="capture-groups"> Use capture groups</label>
+                <div class="capture-group-select" id="capture-group-select" style="display: none;">
+                    <label for="group-number">Capture group:</label>
+                    <select id="group-number">
+                        <option value="0">Full match (0)</option>
+                        <option value="1">Group 1</option>
+                        <option value="2">Group 2</option>
+                        <option value="3">Group 3</option>
+                        <option value="4">Group 4</option>
+                        <option value="5">Group 5</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <label for="string-composer">4. String Composer (optional):</label>
+            <div class="composer-controls">
+                <label><input type="checkbox" id="enable-string-composer"> Compose custom strings</label>
+            </div>
+            <div class="string-composer-options" id="string-composer-options" style="display: none;">
+                <textarea id="string-template" placeholder="Use {0} for full match, {1} for group 1, {2} for group 2, etc.&#10;Example: &quot;Title: {1}, URL: {2}&quot;"></textarea>
+                <div class="composer-help">
+                    <small>Use {0} for full match, {1}-{5} for capture groups. Example: "Found: {1} in {2}"</small>
+                </div>
+            </div>
+        </div>
+        
+        <button id="extract-btn">Extract Text</button>
+        
+        <div class="results-section">
+            <div class="results-header">
+                <label>Results (<span id="match-count">0</span> matches):</label>
+                <div class="result-actions">
+                    <button id="copy-btn" disabled>Copy All</button>
+                    <button id="clear-btn" disabled>Clear</button>
+                </div>
+            </div>
+            <div id="results" class="results-container"></div>
+        </div>
+        
+        <div class="presets">
+            <label>Quick Presets:</label>
+            <div class="preset-buttons">
+                <button class="preset-btn" data-pattern="\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b" data-flags="gi">Emails</button>
+                <button class="preset-btn" data-pattern="https?://[^\\s<>\"]+|www\\.[^\\s<>\"]+|[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\\s<>\"]{2,}" data-flags="gi">URLs</button>
+                <button class="preset-btn" data-pattern="\\b\\d{3}-\\d{3}-\\d{4}\\b|\\b\\(\\d{3}\\)\\s*\\d{3}-\\d{4}\\b|\\b\\d{3}\\.\\d{3}\\.\\d{4}\\b" data-flags="g">Phone Numbers</button>
+                <button class="preset-btn" data-pattern="\\b\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2})?\\b|\\$\\d+(?:,\\d{3})*(?:\\.\\d{2})?" data-flags="g">Numbers/Prices</button>
+                <button class="preset-btn" data-pattern="<([a-zA-Z][^>]*)>" data-flags="gi" data-target="html">HTML Tags</button>
+                <button class="preset-btn" data-pattern="class=[\"']([^\"']*)[\"']" data-flags="gi" data-target="html" data-capture="true" data-group="1">CSS Classes</button>
+                <button class="preset-btn" data-pattern="id=[\"']([^\"']*)[\"']" data-flags="gi" data-target="html" data-capture="true" data-group="1">HTML IDs</button>
+                <button class="preset-btn" data-pattern="<h([1-6])>(.*?)</h\\1>" data-flags="gi" data-target="html" data-capture="true" data-group="2">Heading Text</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>
