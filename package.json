@@ -1,0 +1,40 @@
+{
+  "name": "regextractor",
+  "version": "1.0.0",
+  "description": "Extract text from web pages using custom regex patterns",
+  "main": "background.js",
+  "scripts": {
+    "build": "./build-advanced.sh",
+    "build:firefox": "./build.sh",
+    "build:simple": "./build.sh",
+    "clean": "rm -rf dist build *.zip *.crx",
+    "dev": "web-ext run --source-dir=dist --start-url=about:debugging",
+    "dev:firefox": "web-ext run --source-dir=build/firefox --start-url=about:debugging",
+    "dev:chrome": "echo 'Load build/chrome folder in Chrome Extensions (chrome://extensions/)'",
+    "lint": "web-ext lint --source-dir=dist",
+    "lint:firefox": "web-ext lint --source-dir=build/firefox",
+    "package": "npm run build && web-ext build --source-dir=build/firefox --artifacts-dir=web-ext-artifacts",
+    "install-deps": "npm install",
+    "install:firefox": "./install-firefox.sh"
+  },
+  "keywords": [
+    "chrome-extension",
+    "firefox-extension",
+    "regex",
+    "text-extraction",
+    "web-scraping"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "web-ext": "^7.12.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kadirkun/RegExtractor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kadirkun/RegExtractor/issues"
+  },
+  "homepage": "https://github.com/kadirkun/RegExtractor#readme"
+}
